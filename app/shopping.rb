@@ -1,6 +1,7 @@
 =begin
   This routine used to solve the recruitment problem.
-  v0.0.1 2011.05.03 by Ruijian Cao on Ubuntu10.10/x86 with ruby 1.8.7.
+  Evironment: Ubuntu10.10/x86 with ruby 1.8.7.
+  2011.05.03 v0.0.1 by Ruijian Cao 
 =end
 
 #display like "0.10 not 0.1"
@@ -19,7 +20,7 @@ def round_up_half(d)
     ((d*10).to_i*10+5)/100.0
   else
     #0.00
-    ((d*100).to_i)/100.0
+    (d*100).to_i/100.0
   end
 end
 
@@ -79,7 +80,7 @@ class App
              .add_item(1, 'chocolate bar', 0.85, 0, 0)\
          .output
     
-    #5%, with no exemptions
+    #all imported goods at a rate of 5%, with no exemptions.
     puts "\nOutput2"
     Order.new.add_item(1, 'imported box of chocolateds', 10.00, 0, 1)\
              .add_item(1, 'imported bottle of perfume', 47.50, 1, 1)\

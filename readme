@@ -4,8 +4,7 @@ Welcome! This project used to handle a recruitment problem.
 app/shopping.rb            application code, run with: ruby app/shopping.rb
 test/shopping_test.rb      test code, run with: ruby test/shopping_test.rb
 
-#find me at github: 
-
+#find me at github: https://github.com/cao7113/sales_taxes
 
 #--------------The original problem
 SALES TAXES

@@ -48,11 +48,11 @@ class TestOrder < Test::Unit::TestCase
                               1 box of imported chocolates at 11.25, food
                             INPUT3
                           )
-    assert compare_floats(o.items[0].total, 32.19)
-    assert compare_floats(o.items[1].total, 20.89)
-    assert compare_floats(o.items[2].total, 9.75)
-    assert compare_floats(o.items[3].total, 11.85)
-    assert compare_floats(o.total_tax, 6.70)
-    assert compare_floats(o.total_price, 74.68)
+    assert compare_floats(32.19, o.items[0].total)
+    assert compare_floats(20.89, o.items[1].total)
+    assert compare_floats(9.75, o.items[2].total)
+    assert compare_floats(11.85, o.items[3].total)
+    assert compare_floats(6.70, o.total_tax)
+    assert compare_floats(74.68, o.total_price)
   end
 end

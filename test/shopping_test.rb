@@ -15,9 +15,12 @@ class TestOrder < Test::Unit::TestCase
   end
   
   def test_base_rate
-    o=Order.new.add_item(1, 'book', 12.49, 0, 0)\
-               .add_item(1, 'music CD', 14.99, 1, 0)\
-               .add_item(1, 'chocolate bar', 0.85, 0, 0)
+    o=Order.new.load_items(<<-INPUT1
+                            1 book at 12.49, books
+                            1 music CD at 14.99
+                            1 chocolate bar at 0.85, food
+                          INPUT1
+                          )
     assert compare_floats(12.49, o.items[0].total)
     assert compare_floats(16.49, o.items[1].total)
     assert compare_floats(0.85, o.items[2].total)
@@ -26,8 +29,11 @@ class TestOrder < Test::Unit::TestCase
   end
   
   def test_import_rate
-    o=Order.new.add_item(1, 'imported box of chocolateds', 10.00, 0, 1)\
-               .add_item(1, 'imported bottle of perfume', 47.50, 1, 1)
+    o=Order.new.load_items(<<-INPUT2
+                              1 imported box of chocolateds at 10.00, food
+                              1 imported bottle of perfume at 47.50
+                            INPUT2
+                           )
     assert compare_floats(10.50, o.items[0].total)
     assert compare_floats(54.65, o.items[1].total)
     assert compare_floats(7.65, o.total_tax)    
@@ -35,10 +41,13 @@ class TestOrder < Test::Unit::TestCase
   end
   
   def test_hybrid_rate
-    o=Order.new.add_item(1, 'imported bottle of perfume', 27.99, 1, 1)\
-               .add_item(1, 'bottle of perfume', 18.99, 1, 0)\
-               .add_item(1, 'packet of headache pills', 9.75, 0, 0)\
-               .add_item(1, 'box of imported chocolates', 11.25, 0, 1)
+    o=Order.new.load_items(<<-INPUT3
+                              1 imported bottle of perfume at 27.99
+                              1 bottle of perfume at 18.99
+                              1 packet of headache pills at 9.75, medical products
+                              1 box of imported chocolates at 11.25, food
+                            INPUT3
+                          )
     assert compare_floats(o.items[0].total, 32.19)
     assert compare_floats(o.items[1].total, 20.89)
     assert compare_floats(o.items[2].total, 9.75)

@@ -1,7 +1,8 @@
 =begin
   This routine used to solve the recruitment problem.
   Evironment: Ubuntu10.10/x86 with ruby 1.8.7.
-  2011.05.03 v0.0.1 by Ruijian Cao 
+  2011.05.03 v0.0.1 created by Ruijian Cao 
+  2011.05.03 v0.0.2 modified input way by Ruijian Cao
 =end
 
 #display like "0.10 not 0.1"
@@ -36,7 +37,16 @@ class LineItem
       name, amount, original, basic_tr, import_tr    
     self.taxed_part=round_up_half(original*(BASE_RATE*basic_tr+IMPORT_RATE*import_tr))
   end
-    
+  
+  def self.parse(item_str, type=nil)
+    result=item_str.match(/^(\d+)\s+(.*)\s+at\s+(\d+\.\d+)\s*/)
+    raise "Invalid input #{item_str}" if result.size<3
+    base_tr=['books', "food", "medical products"].member?(type.to_s) ? 0 : 1
+    name=result[2]
+    import_tr=name.to_s.include?('imported') ? 1 : 0
+    new(result[1].to_i, result[2], result[3].to_f, base_tr, import_tr)
+  end
+      
   def total
     (original+taxed_part)*amount
   end
@@ -54,17 +64,27 @@ class Order
   def initialize
     self.items, self.total_tax, self.total_price=[], 0, 0    
   end
-  
-  def add_item(amount, name, original, basic_tr, import_tr)
-    i=LineItem.new(amount, name, original, basic_tr, import_tr)
+        
+  def load_item(item_str, type)
+    i=LineItem.parse(item_str, type)
     items<<i
     self.total_tax+=i.taxed_part
     self.total_price+=i.total
     self
   end
   
+  def load_items(items_str)
+    raise "Invalid items!" if items_str.nil?
+    items1=items_str.split("\n")
+    items1.each do |i|
+      i1=i.split(",")
+      load_item(i1[0].to_s.strip, i1[1].to_s.strip)
+    end
+    self
+  end
+  
   def output
-    self.items.each{|i| i.taxed_item}
+    items.each{|i| i.taxed_item}
     puts "Sales Taxes: #{disp_dollar(total_tax)}"
     puts "Total: #{disp_dollar(total_price)}"
   end  
@@ -72,26 +92,30 @@ class Order
 end
 
 class App  
-  def self.run
-    #10% on all goods, except books, food, and medical products that are exempt.
+  def self.run    
+    input1=<<-INPUT1
+      1 book at 12.49, books
+      1 music CD at 14.99
+      1 chocolate bar at 0.85, food
+    INPUT1
     puts "Output1:"
-    Order.new.add_item(1, 'book', 12.49, 0, 0)\
-             .add_item(1, 'music CD', 14.99, 1, 0)\
-             .add_item(1, 'chocolate bar', 0.85, 0, 0)\
-         .output
+    Order.new.load_items(input1).output
     
-    #all imported goods at a rate of 5%, with no exemptions.
+    input2=<<-INPUT2
+      1 imported box of chocolateds at 10.00, food
+      1 imported bottle of perfume at 47.50
+    INPUT2
     puts "\nOutput2"
-    Order.new.add_item(1, 'imported box of chocolateds', 10.00, 0, 1)\
-             .add_item(1, 'imported bottle of perfume', 47.50, 1, 1)\
-         .output
-         
+    Order.new.load_items(input2).output
+
+    input3=<<-INPUT3
+      1 imported bottle of perfume at 27.99
+      1 bottle of perfume at 18.99
+      1 packet of headache pills at 9.75, medical products
+      1 box of imported chocolates at 11.25, food
+    INPUT3
     puts "\nOutput3"    
-    Order.new.add_item(1, 'imported bottle of perfume', 27.99, 1, 1)\
-             .add_item(1, 'bottle of perfume', 18.99, 1, 0)\
-             .add_item(1, 'packet of headache pills', 9.75, 0, 0)\
-             .add_item(1, 'box of imported chocolates', 11.25, 0, 1)\
-         .output
+    Order.new.load_items(input3).output
   end
 end
 

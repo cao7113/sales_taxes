@@ -18,6 +18,7 @@
              
 =end
 
+#=============Utility Functions
 #display "0.10 not 0.1"
 def disp_dollar(d)
   "%.2f" % d
@@ -38,8 +39,9 @@ def round_up_half(d)
   end
 end
 
+#===========Taxable module
 module BaseTax
-  #TODO dynamically maintain?
+  #TODO maintain by hand?
   FREE_LIST=["book", "chocolate bar", "chocolateds", "chocolates", "headache pills"]
   BASE_RATE=10.0/100
   
@@ -76,8 +78,12 @@ module Taxable
   include BaseTax
   include ImportTax
   
-  def tax_part
-    #dynamical computing using reflection
+  def self.included(clazz)
+    #TODO check preconditions such as name, price method
+  end
+  
+  #caculate tax part using reflection
+  def tax_part    
     taxes=self.class.included_modules.map(&:name).select{|n| n=~/.+Tax/}
     _tax=0.0
     taxes.each do |t|
@@ -98,6 +104,7 @@ module Taxable
   end
 end
 
+#===========Business Logic
 class Item
   attr_accessor :name, :price
   
@@ -194,5 +201,3 @@ end
 
 #run this only when invoking this file standalone!
 App.run if __FILE__ == $0
-
-
